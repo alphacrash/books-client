@@ -1,24 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import getUrlFromConfig from "./utils";
+import axios from "axios";
+import BookCard from "./components/Book";
+import { Container, Grid, Typography } from "@mui/material";
+import CreateBook from "./components/CreateBook";
 
 function App() {
+  const [books, setBooks] = useState([]);
+
+  const getBooks = async () => {
+    const { data } = await axios.get(getUrlFromConfig("api"));
+    setBooks(data);
+  };
+
+  useEffect(() => {
+    getBooks();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h4">Books</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <CreateBook onCreate={getBooks} />
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container spacing={2}>
+            {books.map((book) => (
+              <Grid item xs={12} sm={6} key={book.id}>
+                <BookCard book={book} onDelete={getBooks} />
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
 
